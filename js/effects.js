@@ -2,291 +2,310 @@
   'use strict';
 
   const TWO_PI = Math.PI * 2;
-  const style = document.createElement('style');
-  style.textContent = `
-    #armor-x-effects{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;background:#010407}
-    #armor-x-webgl{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:1}
-    #app{position:relative;z-index:1}
-    .site-background{z-index:-1!important;background:transparent!important}
-    .armor-visual .ax-suit-svg{position:absolute;inset:4% 12%;width:76%;height:92%;z-index:5;pointer-events:none;filter:drop-shadow(0 0 12px rgba(80,220,255,.28));animation:axSuitDrift 2.9s ease-in-out infinite}
-    .armor-visual.ax-enhanced .armor-silhouette{display:none!important}
-    .ax-reactor-shell{position:absolute;left:50%;top:50%;width:min(58%,250px);aspect-ratio:1;transform:translate(-50%,-50%);z-index:8;pointer-events:none;mix-blend-mode:screen;filter:drop-shadow(0 0 24px rgba(60,220,255,.55))}
-    .ax-reactor-shell canvas{width:100%;height:100%;display:block}
-    .ax-reactor-label{position:absolute;left:50%;top:108%;transform:translateX(-50%);font:8px var(--mono,monospace);letter-spacing:.22em;color:#d9fcff;text-shadow:0 0 14px rgba(90,225,255,1);white-space:nowrap}
-    @keyframes axSuitDrift{0%,100%{transform:translate3d(0,0,0) rotate(0deg)}25%{transform:translate3d(3px,-10px,0) rotate(-.5deg)}55%{transform:translate3d(-3px,5px,0) rotate(.45deg)}78%{transform:translate3d(2px,-4px,0) rotate(-.2deg)}}
-  `;
-  document.head.appendChild(style);
 
-  const root = document.createElement('div');
-  root.id = 'armor-x-effects';
-  root.setAttribute('aria-hidden','true');
-  const canvas = document.createElement('canvas');
-  canvas.id = 'armor-x-webgl';
-  root.appendChild(canvas);
-  document.body.prepend(root);
+  function addMotionLayer() {
+    if (document.getElementById('ax-motion-layer')) return;
 
-  const gl = canvas.getContext('webgl', {alpha:false, antialias:false, powerPreference:'high-performance'});
-  if (!gl) {
-    console.error('[Armor X] WebGL unavailable');
-    return;
-  }
-
-  const vertexSource = `
-    attribute vec2 a_position;
-    varying vec2 v_uv;
-    void main(){v_uv=a_position*.5+.5;gl_Position=vec4(a_position,0.0,1.0);}
-  `;
-
-  const fragmentSource = `
-    precision highp float;
-    varying vec2 v_uv;
-    uniform vec2 u_resolution;
-    uniform float u_time;
-    uniform vec2 u_pointer;
-
-    #define PI 3.14159265359
-    #define TAU 6.28318530718
-
-    float hash21(vec2 p){p=fract(p*vec2(127.1,311.7));p+=dot(p,p+34.5);return fract(p.x*p.y);}
-    float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);float a=hash21(i),b=hash21(i+vec2(1.,0.)),c=hash21(i+vec2(0.,1.)),d=hash21(i+vec2(1.,1.));return mix(mix(a,b,f.x),mix(c,d,f.x),f.y);}
-    float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<4;i++){v+=noise(p)*a;p=p*2.02+7.13;a*=.5;}return v;}
-    float gridLine(float x,float w){return 1.0-smoothstep(0.0,w,abs(fract(x)-.5));}
-    float seg(float x,float a,float b,float blur){return smoothstep(a-blur,a,x)*(1.0-smoothstep(b,b+blur,x));}
-
-    void main(){
-      vec2 uv=v_uv;
-      vec2 p=uv*2.0-1.0;
-      float aspect=u_resolution.x/u_resolution.y;
-      p.x*=aspect;
-      p+= (u_pointer-.5)*.06;
-
-      float t=u_time;
-      float radius=length(p);
-      float vign=1.0-smoothstep(.65,1.65,radius);
-      vec3 col=vec3(.003,.008,.012);
-
-      // Layered animated atmospheric field.
-      float fog=fbm(p*2.0+vec2(t*.025,-t*.018));
-      col+=vec3(.003,.028,.045)*fog;
-      col+=vec3(.0,.035,.06)*(1.0-smoothstep(.1,1.35,radius));
-
-      // Large cybermesh.
-      vec2 g=p*vec2(11.0,15.5);
-      g.y+=t*.85;
-      g.x+=sin(t*.35)*.7;
-      float gx=gridLine(g.x,.055);
-      float gy=gridLine(g.y,.055);
-      float gxm=gridLine(g.x*2.0,.025);
-      float gym=gridLine(g.y*2.0,.025);
-      float mesh=(gx+gy)*.9+(gxm+gym)*.22;
-      float wave=.5+.5*sin(t*2.4+g.x*.65+g.y*.28);
-      col+=vec3(.005,.095,.14)*mesh*(.6+.75*wave);
-
-      // Sweeping energy fronts: unmistakable movement across the whole screen.
-      float sweep1=seg(fract((uv.x*.72+uv.y*.38)-t*.12),.02,.08,.012);
-      float sweep2=seg(fract((uv.x*.25-uv.y*.9)+t*.095),.41,.48,.014);
-      float sweep3=seg(fract((uv.x*.9+uv.y*.18)+t*.055),.77,.835,.018);
-      float sweeps=sweep1+sweep2+sweep3;
-      col+=vec3(.02,.24,.34)*sweeps;
-      col+=vec3(.3,.9,1.)*pow(sweeps,3.0)*.85;
-
-      // Animated traveling nodes embedded in the grid.
-      vec2 cellSize=vec2(11.0,15.5);
-      vec2 cell=floor((p+vec2(aspect,1.0))*cellSize*.5);
-      vec2 f=fract((p+vec2(aspect,1.0))*cellSize*.5)-.5;
-      float nodePhase=hash21(cell)*TAU;
-      float travel=fract(hash21(cell+3.1)+t*(.11+.08*hash21(cell+8.2)));
-      float nodeRadius=.025+.018*sin(t*6.0+nodePhase);
-      float node=smoothstep(nodeRadius,.0,length(f-vec2(0.45*sin(travel*TAU),0.45*cos(travel*TAU))));
-      float pulse=.3+.7*(.5+.5*sin(t*8.0+nodePhase));
-      col+=vec3(.02,.25,.34)*node*pulse;
-      col+=vec3(.35,.95,1.)*pow(node,4.0)*pulse;
-
-      // Moving diagonal electrical filaments.
-      for(int i=0;i<7;i++){
-        float fi=float(i);
-        float n=hash21(vec2(fi,44.2));
-        float a=fract(.13*fi+n+t*(.018+fi*.004));
-        float d=abs(fract((p.x+p.y*.72)*3.2+n)-a);
-        d=min(d,1.0-d);
-        float filament=smoothstep(.035,0.0,d)*(1.0-smoothstep(1.0,0.15,abs(p.x+p.y*.72)));
-        float flash=.5+.5*sin(t*(4.0+fi*.7)+n*20.0);
-        col+=vec3(.0,.12,.2)*filament*(.5+.5*flash);
-        col+=vec3(.22,.75,.95)*pow(filament,4.0)*flash;
+    const style = document.createElement('style');
+    style.textContent = `
+      #ax-motion-layer {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 50% 50%, rgba(0,210,255,.10), transparent 32%),
+          radial-gradient(circle at 15% 25%, rgba(0,160,255,.06), transparent 28%),
+          radial-gradient(circle at 85% 70%, rgba(20,255,220,.05), transparent 26%);
       }
+      #ax-motion-layer::before {
+        content: '';
+        position: absolute;
+        inset: -30%;
+        background-image:
+          linear-gradient(rgba(0,220,255,.12) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0,220,255,.12) 1px, transparent 1px);
+        background-size: 56px 56px;
+        transform: perspective(900px) rotateX(62deg) translateY(-12%);
+        transform-origin: center;
+        animation: axGridDrift 8s linear infinite;
+        opacity: .75;
+      }
+      #ax-motion-layer::after {
+        content: '';
+        position: absolute;
+        inset: -20%;
+        background:
+          linear-gradient(115deg, transparent 0 43%, rgba(0,240,255,.0) 46%, rgba(0,240,255,.55) 49%, rgba(0,240,255,0) 52%, transparent 56%),
+          linear-gradient(295deg, transparent 0 44%, rgba(40,255,220,.0) 47%, rgba(40,255,220,.38) 49%, rgba(40,255,220,0) 51%, transparent 54%);
+        background-size: 70% 70%, 90% 90%;
+        animation: axEnergySweep 3.2s linear infinite;
+        mix-blend-mode: screen;
+        opacity: .8;
+      }
+      .ax-motion-node {
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #9ff8ff;
+        box-shadow: 0 0 8px #00eaff, 0 0 20px rgba(0,220,255,.8);
+        animation: axNodePulse 1.6s ease-in-out infinite, axNodeTravel var(--travel, 7s) linear infinite;
+      }
+      .ax-motion-line {
+        position: absolute;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(0,235,255,.9), transparent);
+        box-shadow: 0 0 8px rgba(0,220,255,.8);
+        transform-origin: left center;
+        animation: axLineTravel var(--duration, 5s) linear infinite;
+      }
+      @keyframes axGridDrift {
+        from { background-position: 0 0, 0 0; }
+        to   { background-position: 56px 56px, 56px 56px; }
+      }
+      @keyframes axEnergySweep {
+        from { transform: translate3d(-15%, -8%, 0); }
+        to   { transform: translate3d(15%, 8%, 0); }
+      }
+      @keyframes axNodePulse {
+        0%,100% { opacity: .25; transform: scale(.65); }
+        50% { opacity: 1; transform: scale(1.35); }
+      }
+      @keyframes axNodeTravel {
+        from { left: -5%; }
+        to { left: 105%; }
+      }
+      @keyframes axLineTravel {
+        from { transform: translateX(-30vw) rotate(var(--angle, 0deg)); opacity: 0; }
+        15% { opacity: 1; }
+        85% { opacity: 1; }
+        to { transform: translateX(130vw) rotate(var(--angle, 0deg)); opacity: 0; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #ax-motion-layer::before,
+        #ax-motion-layer::after,
+        .ax-motion-node,
+        .ax-motion-line { animation-duration: .001ms !important; animation-iteration-count: 1 !important; }
+      }
+    `;
+    document.head.appendChild(style);
 
-      // Dense drifting particle field.
-      vec2 sid=floor((uv+vec2(t*.008,-t*.006))*vec2(54.,38.));
-      vec2 sf=fract((uv+vec2(t*.008,-t*.006))*vec2(54.,38.))-.5;
-      float sh=hash21(sid);
-      float particle=smoothstep(.055,.0,length(sf));
-      particle*=step(.79,sh);
-      float twinkle=.25+.75*(.5+.5*sin(t*(2.0+sh*8.0)+sh*50.0));
-      col+=vec3(.12,.52,.7)*particle*twinkle;
+    const layer = document.createElement('div');
+    layer.id = 'ax-motion-layer';
+    document.body.prepend(layer);
 
-      // Central electromagnetic disturbance behind the suit.
-      float core=smoothstep(.6,.03,radius);
-      float rings=.5+.5*sin(radius*54.0-t*5.5+sin(t*2.0+radius*10.0));
-      col+=vec3(.0,.025,.05)*core;
-      col+=vec3(.01,.13,.19)*rings*core*.25;
+    const nodeData = [
+      [7,18,6.2],[18,63,8.1],[29,31,7.4],[41,76,9.3],[53,17,6.8],
+      [65,57,8.7],[76,27,7.1],[89,72,9.8],[95,42,6.6],[12,88,10.2]
+    ];
+    nodeData.forEach(([x,y,t], i) => {
+      const n = document.createElement('span');
+      n.className = 'ax-motion-node';
+      n.style.left = `${x}%`;
+      n.style.top = `${y}%`;
+      n.style.setProperty('--travel', `${t}s`);
+      n.style.animationDelay = `${-(i * .67)}s, ${-(i * .91)}s`;
+      layer.appendChild(n);
+    });
 
-      // Vertical scan pulse.
-      float scan=pow(smoothstep(.0,.018,abs(fract(uv.y-t*.16)-.5)),2.0);
-      col+=vec3(.02,.12,.18)*scan;
+    const lineData = [
+      [12,22,38,-8,5.5],[42,31,28,7,4.4],[68,18,34,-5,6.2],[18,55,46,4,7.1],
+      [53,68,41,-11,5.8],[76,78,36,8,6.7],[4,84,32,-4,4.8]
+    ];
+    lineData.forEach(([x,y,w,angle,d], i) => {
+      const line = document.createElement('span');
+      line.className = 'ax-motion-line';
+      line.style.left = `${x}%`;
+      line.style.top = `${y}%`;
+      line.style.width = `${w}vw`;
+      line.style.setProperty('--angle', `${angle}deg`);
+      line.style.setProperty('--duration', `${d}s`);
+      line.style.animationDelay = `${-(i * .83)}s`;
+      layer.appendChild(line);
+    });
+  }
 
-      col*=vign+.28;
-      gl_FragColor=vec4(col,1.0);
+  function buildWebGL() {
+    if (!window.WebGLRenderingContext) return null;
+    const canvas = document.createElement('canvas');
+    canvas.id = 'armor-x-webgl';
+    canvas.setAttribute('aria-hidden', 'true');
+
+    const gl = canvas.getContext('webgl', { alpha: true, antialias: false, powerPreference: 'high-performance' });
+    if (!gl) return null;
+
+    const vertexSource = `attribute vec2 a_position; void main(){gl_Position=vec4(a_position,0.0,1.0);}`;
+    const fragmentSource = `
+      precision mediump float;
+      uniform vec2 u_resolution;
+      uniform float u_time;
+      uniform vec2 u_pointer;
+      float hash21(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+      float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);float a=hash21(i),b=hash21(i+vec2(1,0)),c=hash21(i+vec2(0,1)),d=hash21(i+vec2(1,1));return mix(mix(a,b,f.x),mix(c,d,f.x),f.y);}
+      float fbm(vec2 p){float v=0.0,a=0.5;for(int i=0;i<5;i++){v+=a*noise(p);p*=2.03;a*=0.5;}return v;}
+      void main(){
+        vec2 uv=gl_FragCoord.xy/u_resolution.xy;
+        vec2 p=(gl_FragCoord.xy-.5*u_resolution.xy)/u_resolution.y;
+        float t=u_time;
+        float g=0.0;
+        vec2 gp=p*28.0;
+        float gx=abs(fract(gp.x)-.5), gy=abs(fract(gp.y)-.5);
+        g += smoothstep(.035,.0,gx)+smoothstep(.035,.0,gy);
+        float wave=sin((p.x+p.y)*7.0-t*1.9)*.5+.5;
+        float sweep=smoothstep(.0,.018,abs(fract((p.x*1.7-p.y*.9)-t*.12)-.5));
+        float plasma=fbm(p*4.5+vec2(t*.16,-t*.11));
+        vec3 c=vec3(0.0,0.02,0.03);
+        c+=vec3(0.0,.12,.18)*g*(.55+.45*sin(t+g));
+        c+=vec3(0.0,.18,.25)*pow(wave,8.0);
+        c+=vec3(.0,.35,.42)*sweep*(.35+.65*plasma);
+        float radial=exp(-4.0*length(p))*(.35+.65*sin(t*3.2+length(p)*28.0));
+        c+=vec3(0.0,.18,.25)*max(radial,0.0);
+        c+=vec3(.0,.03,.05)*(1.0-length(uv-.5)*1.35);
+        gl_FragColor=vec4(c,0.92);
+      }
+    `;
+
+    function compile(type, source) {
+      const shader = gl.createShader(type);
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        console.error('Armor X shader compile error:', gl.getShaderInfoLog(shader));
+        gl.deleteShader(shader);
+        return null;
+      }
+      return shader;
     }
-  `;
+    const vs = compile(gl.VERTEX_SHADER, vertexSource);
+    const fs = compile(gl.FRAGMENT_SHADER, fragmentSource);
+    if (!vs || !fs) return null;
 
-  function shader(type, source){
-    const s=gl.createShader(type);
-    gl.shaderSource(s,source);
-    gl.compileShader(s);
-    if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)||'shader compile failed');
-    return s;
-  }
-
-  let program;
-  try{
-    const vs=shader(gl.VERTEX_SHADER,vertexSource);
-    const fs=shader(gl.FRAGMENT_SHADER,fragmentSource);
-    program=gl.createProgram();
-    gl.attachShader(program,vs);gl.attachShader(program,fs);gl.linkProgram(program);
-    if(!gl.getProgramParameter(program,gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program)||'program link failed');
-  }catch(err){
-    console.error('[Armor X] WebGL shader error',err);
-    root.remove();
-    return;
-  }
-
-  const quad=gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER,quad);
-  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
-  const position=gl.getAttribLocation(program,'a_position');
-  const resolution=gl.getUniformLocation(program,'u_resolution');
-  const time=gl.getUniformLocation(program,'u_time');
-  const pointer=gl.getUniformLocation(program,'u_pointer');
-
-  let width=innerWidth,height=innerHeight,dpr=1;
-  let pointerX=.5,pointerY=.5;
-  let targetX=.5,targetY=.5;
-
-  function resize(){
-    width=innerWidth;height=innerHeight;dpr=Math.min(devicePixelRatio||1,2);
-    canvas.width=Math.floor(width*dpr);canvas.height=Math.floor(height*dpr);
-    canvas.style.width=width+'px';canvas.style.height=height+'px';
-    gl.viewport(0,0,canvas.width,canvas.height);
-  }
-
-  function draw(now){
-    pointerX+=(targetX-pointerX)*.045;
-    pointerY+=(targetY-pointerY)*.045;
+    const program = gl.createProgram();
+    gl.attachShader(program, vs); gl.attachShader(program, fs); gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      console.error('Armor X shader link error:', gl.getProgramInfoLog(program));
+      return null;
+    }
     gl.useProgram(program);
-    gl.bindBuffer(gl.ARRAY_BUFFER,quad);
-    gl.enableVertexAttribArray(position);
-    gl.vertexAttribPointer(position,2,gl.FLOAT,false,0,0);
-    gl.uniform2f(resolution,width,height);
-    gl.uniform1f(time,now*.001);
-    gl.uniform2f(pointer,pointerX,pointerY);
-    gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
-    requestAnimationFrame(draw);
-  }
 
-  addEventListener('resize',resize,{passive:true});
-  addEventListener('pointermove',e=>{targetX=e.clientX/Math.max(1,width);targetY=e.clientY/Math.max(1,height)},{passive:true});
-  addEventListener('pointerleave',()=>{targetX=.5;targetY=.5},{passive:true});
-  resize();
-  requestAnimationFrame(draw);
+    const buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+    const pos = gl.getAttribLocation(program, 'a_position');
+    gl.enableVertexAttribArray(pos);
+    gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+    const uResolution = gl.getUniformLocation(program, 'u_resolution');
+    const uTime = gl.getUniformLocation(program, 'u_time');
+    const uPointer = gl.getUniformLocation(program, 'u_pointer');
+    let dpr = 1, width = 0, height = 0;
 
-  function installSuit(){
-    const visual=document.querySelector('.armor-visual');
-    if(!visual)return;
-    visual.classList.add('ax-enhanced');
-    if(!visual.querySelector('.ax-suit-svg')){
-      const ns='http://www.w3.org/2000/svg';
-      const svg=document.createElementNS(ns,'svg');
-      svg.classList.add('ax-suit-svg');svg.setAttribute('viewBox','0 0 420 760');svg.setAttribute('aria-hidden','true');
-      svg.innerHTML=`<defs><linearGradient id="axMetal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#071118"/><stop offset=".45" stop-color="#324a57"/><stop offset=".72" stop-color="#081219"/><stop offset="1" stop-color="#4a7887"/></linearGradient><radialGradient id="axCore"><stop stop-color="#fff"/><stop offset=".13" stop-color="#d8ffff"/><stop offset=".34" stop-color="#42dcff" stop-opacity=".96"/><stop offset="1" stop-color="#079bda" stop-opacity="0"/></radialGradient></defs><g fill="url(#axMetal)" stroke="#79e1ff" stroke-opacity=".74" stroke-width="2"><path d="M184 55l10-24 16-12 16 12 10 24-6 40-12 12h-16l-12-12z"/><path d="M181 102l-42 27-14 50 21 43 35-20 6-53z"/><path d="M239 102l42 27 14 50-21 43-35-20-6-53z"/><path d="M183 101l27-11 27 11 27 32-13 105-16 34h-51l-16-34-13-105z"/><path d="M170 231l20 35h40l20-35 13 73-28 28h-50l-28-28z"/><path d="M166 315l44 15 44-15 19 91-35 20h-56l-35-20z"/><path d="M128 177l-24 14-14 47 15 22 21-14 16-42z"/><path d="M292 177l24 14 14 47-15 22-21-14-16-42z"/><path d="M165 399l45 20 45-20 12 64-27 102-30 24-30-24-27-102z"/><path d="M154 560l36 14-7 94-18 38h-29l8-54z"/><path d="M266 560l-36 14 7 94 18 38h29l-8-54z"/></g><g fill="none" stroke="#c7faff" stroke-linecap="round"><path d="M188 69q22-18 44 0" stroke-width="4"/><path d="M175 130l35-17 35 17M171 158l39-22 39 22" stroke-width="3"/><path d="M169 350l41-13 41 13" stroke-width="3"/><path d="M150 216l26-13M270 203l-26 13" stroke-width="4"/><path d="M156 454l25 8M264 454l-25 8M154 500l26-10M266 500l-26-10" stroke-width="3" opacity=".8"/></g><circle cx="210" cy="245" r="58" fill="url(#axCore)"/><circle cx="210" cy="245" r="15" fill="#f7ffff"/><circle cx="210" cy="245" r="32" fill="none" stroke="#68ddff" stroke-width="2" stroke-dasharray="7 10"/>`;
-      visual.appendChild(svg);
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+      width = Math.floor(innerWidth * dpr); height = Math.floor(innerHeight * dpr);
+      canvas.width = width; canvas.height = height;
+      canvas.style.width = '100vw'; canvas.style.height = '100vh';
+      gl.viewport(0,0,width,height);
+      gl.uniform2f(uResolution,width,height);
     }
-
-    const old=visual.querySelector('.ax-reactor-shell');if(old)old.remove();
-    const reactor=document.createElement('div');reactor.className='ax-reactor-shell';
-    const rc=document.createElement('canvas');reactor.appendChild(rc);
-    const label=document.createElement('div');label.className='ax-reactor-label';label.textContent='ARC // CRITICAL';reactor.appendChild(label);
-    visual.appendChild(reactor);
-    startReactor(rc);
-  }
-
-  function startReactor(canvas){
-    const ctx=canvas.getContext('2d',{alpha:true});
-    if(!ctx)return;
-    const loops=Array.from({length:12},()=>({phase:Math.random()*TWO_PI,speed:-1.2+Math.random()*2.4,seed:Math.random()*100,tilt:.5+Math.random()*.45}));
-    const sparks=Array.from({length:36},()=>({angle:Math.random()*TWO_PI,r:.5+Math.random()*.55,speed:.4+Math.random()*1.8,phase:Math.random()*TWO_PI}));
-    let size=160,dpr=1;
-
-    function resize(){
-      const b=canvas.parentElement.getBoundingClientRect();
-      size=Math.max(130,Math.floor(Math.min(b.width,b.height)));
-      dpr=Math.min(devicePixelRatio||1,2);
-      canvas.width=Math.floor(size*dpr);canvas.height=Math.floor(size*dpr);canvas.style.width=size+'px';canvas.style.height=size+'px';
-    }
-
-    function frame(now){
-      const t=now*.001;
-      ctx.setTransform(dpr,0,0,dpr,0,0);
-      ctx.clearRect(0,0,size,size);
-      const cx=size/2,cy=size/2;
-      const r=size*.25;
-      const pulse=1+.18*Math.sin(t*7.0)+.08*Math.sin(t*15.0);
-
-      const halo=ctx.createRadialGradient(cx,cy,2,cx,cy,r*2.8);
-      halo.addColorStop(0,'rgba(255,255,255,.9)');halo.addColorStop(.12,'rgba(92,236,255,.8)');halo.addColorStop(.4,'rgba(16,161,218,.24)');halo.addColorStop(1,'rgba(0,20,35,0)');
-      ctx.fillStyle=halo;ctx.beginPath();ctx.arc(cx,cy,r*2.8,0,TWO_PI);ctx.fill();
-
-      for(let i=0;i<loops.length;i++){
-        const a=loops[i];
-        ctx.save();ctx.translate(cx,cy);ctx.rotate(a.phase+t*a.speed*.55);ctx.scale(1,a.tilt);
-        ctx.beginPath();
-        for(let k=0;k<=150;k++){
-          const q=k/150,ang=q*TWO_PI;
-          const wobble=1+.12*Math.sin(ang*5+t*(2.6+a.seed*.035)+a.seed)+.07*Math.sin(ang*11-t*3.2);
-          const rr=r*(.72+i*.035)*wobble*pulse;
-          const x=Math.cos(ang)*rr,y=Math.sin(ang)*rr;
-          if(k===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
-        }
-        ctx.closePath();ctx.globalCompositeOperation='lighter';ctx.strokeStyle=`rgba(${105+i*8},${226+Math.min(i*2,25)},255,${.18+(i%4)*.045})`;ctx.lineWidth=.8+(i%3)*.42;ctx.shadowBlur=16;ctx.shadowColor='rgba(68,225,255,.9)';ctx.stroke();ctx.restore();
-      }
-
-      // Violent branching arcs.
-      for(let j=0;j<9;j++){
-        const base=t*(.4+j*.11)+j*.73;
-        ctx.save();ctx.translate(cx,cy);ctx.rotate(base);ctx.beginPath();
-        for(let k=0;k<24;k++){
-          const q=k/23;const rr=r*(.18+1.18*q);const jitter=Math.sin(k*3.7+t*13+j)*size*.035*(1-q*.4);
-          const x=rr,y=jitter+Math.sin(k*1.8+t*7+j)*size*.025;
-          if(k===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
-        }
-        ctx.strokeStyle='rgba(177,248,255,.62)';ctx.lineWidth=1.1;ctx.shadowBlur=20;ctx.shadowColor='rgba(69,227,255,1)';ctx.stroke();ctx.restore();
-      }
-
-      for(const s of sparks){
-        s.angle+=.012*s.speed;
-        const rr=r*(.72+.26*Math.sin(t*s.speed+s.phase));
-        const x=cx+Math.cos(s.angle)*rr,y=cy+Math.sin(s.angle)*rr*.82;
-        const a=.2+.8*(.5+.5*Math.sin(t*9+s.phase));
-        ctx.fillStyle=`rgba(203,252,255,${a})`;ctx.shadowBlur=10;ctx.shadowColor='rgba(80,225,255,1)';ctx.beginPath();ctx.arc(x,y,1+a*1.3,0,TWO_PI);ctx.fill();
-      }
-
-      const core=ctx.createRadialGradient(cx,cy,1,cx,cy,r*.7*pulse);
-      core.addColorStop(0,'rgba(255,255,255,1)');core.addColorStop(.08,'rgba(207,255,255,1)');core.addColorStop(.22,'rgba(64,222,255,.95)');core.addColorStop(.62,'rgba(8,127,179,.28)');core.addColorStop(1,'rgba(0,25,42,0)');
-      ctx.fillStyle=core;ctx.beginPath();ctx.arc(cx,cy,r*.7*pulse,0,TWO_PI);ctx.fill();
-      ctx.strokeStyle='rgba(233,255,255,.98)';ctx.lineWidth=2;ctx.shadowBlur=20;ctx.shadowColor='rgba(75,231,255,1)';ctx.beginPath();ctx.arc(cx,cy,r*.16*(1+.18*Math.sin(t*11)),0,TWO_PI);ctx.stroke();
+    let px=.5, py=.5;
+    addEventListener('pointermove', e => { px=e.clientX/innerWidth; py=1-e.clientY/innerHeight; }, {passive:true});
+    function frame(ms){
+      resizeIfNeeded();
+      gl.uniform1f(uTime,ms*.001);
+      gl.uniform2f(uPointer,px,py);
+      gl.drawArrays(gl.TRIANGLES,0,3);
       requestAnimationFrame(frame);
     }
-    resize();addEventListener('resize',resize,{passive:true});requestAnimationFrame(frame);
+    function resizeIfNeeded(){ if(canvas.width !== Math.floor(innerWidth*dpr) || canvas.height !== Math.floor(innerHeight*dpr) || !dpr) resize(); }
+    resize();
+    requestAnimationFrame(frame);
+    return canvas;
   }
 
-  installSuit();
+  function makeSuit() {
+    if (document.querySelector('.ax-suit-overlay')) return;
+    const wrap = document.createElement('div');
+    wrap.className='ax-suit-overlay';
+    wrap.innerHTML=`<div class="ax-suit-glow"></div><div class="ax-suit-placeholder" aria-hidden="true"><div class="ax-head"></div><div class="ax-body"></div><div class="ax-arm ax-arm-l"></div><div class="ax-arm ax-arm-r"></div><div class="ax-leg ax-leg-l"></div><div class="ax-leg ax-leg-r"></div><div class="ax-chest"></div></div>`;
+    document.body.appendChild(wrap);
+    const s=document.createElement('style'); s.textContent=`
+      .ax-suit-overlay{position:fixed;inset:0;z-index:2;pointer-events:none;display:grid;place-items:center;}
+      .ax-suit-glow{position:absolute;width:min(45vw,520px);height:min(65vh,700px);border-radius:50%;background:radial-gradient(circle,rgba(0,220,255,.16),rgba(0,220,255,0) 65%);filter:blur(26px);animation:axSuitBreath 2.8s ease-in-out infinite;}
+      .ax-suit-placeholder{position:relative;width:min(20vw,240px);height:min(58vh,620px);filter:drop-shadow(0 0 14px rgba(0,240,255,.6));animation:axSuitFloat 3.6s ease-in-out infinite;}
+      .ax-head,.ax-body,.ax-arm,.ax-leg,.ax-chest{position:absolute;background:linear-gradient(145deg,#17252e,#061118);border:1px solid rgba(77,239,255,.7);box-shadow:inset 0 0 18px rgba(0,220,255,.07),0 0 10px rgba(0,190,255,.18);}
+      .ax-head{width:24%;height:14%;left:38%;top:2%;border-radius:28% 28% 34% 34%;}
+      .ax-body{width:38%;height:42%;left:31%;top:18%;clip-path:polygon(18% 0,82% 0,100% 18%,88% 100%,12% 100%,0 18%);}
+      .ax-chest{width:22%;height:20%;left:39%;top:27%;border-radius:42%;background:radial-gradient(circle,rgba(0,250,255,.95) 0 10%,rgba(0,110,150,.9) 18%,#08151d 42%);box-shadow:0 0 20px rgba(0,240,255,.85),inset 0 0 24px rgba(0,255,255,.4);animation:axCorePulse 1.35s ease-in-out infinite;}
+      .ax-arm{width:13%;height:37%;top:21%;border-radius:28%;}
+      .ax-arm-l{left:14%;transform:rotate(9deg)} .ax-arm-r{right:14%;transform:rotate(-9deg)}
+      .ax-leg{width:15%;height:38%;top:59%;border-radius:18% 18% 28% 28%;} .ax-leg-l{left:32%;transform:rotate(2deg)} .ax-leg-r{right:32%;transform:rotate(-2deg)}
+      @keyframes axSuitFloat{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-14px,0)}}
+      @keyframes axSuitBreath{0%,100%{transform:scale(.9);opacity:.45}50%{transform:scale(1.12);opacity:.85}}
+      @keyframes axCorePulse{0%,100%{transform:scale(.86);opacity:.7}50%{transform:scale(1.14);opacity:1}}
+      @media(max-width:700px){.ax-suit-placeholder{width:170px;height:470px}.ax-suit-glow{width:300px;height:500px}}
+    `; document.head.appendChild(s);
+  }
+
+  function makeReactor(){
+    if(document.querySelector('.ax-reactor-shell')) return;
+    const host=document.querySelector('.hero-display') || document.body;
+    const shell=document.createElement('div'); shell.className='ax-reactor-shell';
+    const canvas=document.createElement('canvas'); canvas.width=700; canvas.height=700; canvas.setAttribute('aria-hidden','true'); shell.appendChild(canvas); host.appendChild(shell);
+    const c=canvas.getContext('2d');
+    const particles=Array.from({length:38},()=>({a:Math.random()*TWO_PI,r:130+Math.random()*135,s:.5+Math.random()*1.6,p:Math.random()*TWO_PI}));
+    function frame(ms){
+      const t=ms*.001; const w=canvas.width, h=canvas.height; const cx=w/2, cy=h/2;
+      c.clearRect(0,0,w,h);
+      const g=c.createRadialGradient(cx,cy,20,cx,cy,280); g.addColorStop(0,'rgba(0,240,255,.22)'); g.addColorStop(.45,'rgba(0,170,255,.09)'); g.addColorStop(1,'rgba(0,0,0,0)'); c.fillStyle=g; c.fillRect(0,0,w,h);
+      c.save(); c.translate(cx,cy); c.globalCompositeOperation='lighter';
+      for(let k=0;k<10;k++){
+        c.beginPath();
+        for(let i=0;i<=180;i++){
+          const a=i/180*TWO_PI; const rr=150+k*7 + Math.sin(a*(3+k%3)+t*(1.4+k*.08))*14 + Math.sin(a*9-t*2.2+k)*5;
+          const x=Math.cos(a+t*(.18+k*.015))*rr; const y=Math.sin(a-t*(.22+k*.01))*rr*.86;
+          i?c.lineTo(x,y):c.moveTo(x,y);
+        }
+        c.strokeStyle=`rgba(${60+k*6},${180+k*5},255,${.08+k*.018})`; c.lineWidth=1.4; c.shadowBlur=9; c.shadowColor='rgba(0,220,255,.75)'; c.stroke();
+      }
+      for(const p of particles){
+        p.a += .004*p.s;
+        const rr=p.r+Math.sin(t*2.1+p.p)*18; const x=Math.cos(p.a+t*p.s*.8)*rr; const y=Math.sin(p.a+t*p.s*.8)*rr*.8;
+        c.fillStyle='rgba(165,250,255,.95)'; c.shadowBlur=12; c.shadowColor='rgba(0,230,255,1)'; c.beginPath(); c.arc(x,y,1.5+p.s*.35,0,TWO_PI); c.fill();
+      }
+      for(let j=0;j<9;j++){
+        const a0=(j/9)*TWO_PI+t*.4, len=70+38*Math.sin(t*2+j);
+        c.beginPath(); c.moveTo(Math.cos(a0)*18,Math.sin(a0)*18);
+        let x=Math.cos(a0)*18,y=Math.sin(a0)*18;
+        for(let s=0;s<8;s++){ const a=a0+Math.sin(t*5+s+j)*.28; x+=Math.cos(a)*len/8; y+=Math.sin(a)*len/8; c.lineTo(x,y); }
+        c.strokeStyle='rgba(80,245,255,.7)'; c.lineWidth=2.2; c.shadowBlur=16; c.shadowColor='rgba(0,230,255,1)'; c.stroke();
+      }
+      const pulse=1+Math.sin(t*4.5)*.12;
+      const core=c.createRadialGradient(0,0,2,0,0,62*pulse); core.addColorStop(0,'rgba(240,255,255,1)'); core.addColorStop(.16,'rgba(90,255,255,.98)'); core.addColorStop(.48,'rgba(0,220,255,.4)'); core.addColorStop(1,'rgba(0,170,255,0)'); c.fillStyle=core; c.beginPath(); c.arc(0,0,62*pulse,0,TWO_PI); c.fill();
+      c.restore();
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function boot(){
+    addMotionLayer();
+    const stage=document.getElementById('armor-x-effects') || (()=>{const e=document.createElement('div');e.id='armor-x-effects';document.body.prepend(e);return e;})();
+    const webgl=buildWebGL();
+    if(webgl) stage.appendChild(webgl);
+    makeSuit();
+    makeReactor();
+    const s=document.createElement('style'); s.textContent=`
+      #armor-x-effects{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+      #armor-x-webgl{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:.78;}
+      #app{position:relative;z-index:4;}
+      .site-background{background:transparent!important;}
+      .ax-reactor-shell{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;z-index:7;mix-blend-mode:screen;}
+      .hero-display .ax-reactor-shell{position:absolute;}
+      .ax-reactor-shell canvas{width:min(42vw,560px);height:min(42vw,560px);max-width:90%;max-height:90%;filter:drop-shadow(0 0 18px rgba(0,220,255,.55));}
+    `; document.head.appendChild(s);
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
 })();
