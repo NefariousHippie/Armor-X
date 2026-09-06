@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 1200" role="img" aria-labelledby="title desc">
+<title id="title">ARMOR X AX-01 exoskeleton</title>
+<desc id="desc">Original futuristic powered exoskeleton with layered armor, exposed mechanisms, and a luminous chest reactor.</desc>
+<defs>
+  <linearGradient id="shell" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#dce7ed"/><stop offset=".28" stop-color="#6f858f"/><stop offset=".52" stop-color="#1a272e"/><stop offset=".75" stop-color="#9bb0b8"/><stop offset="1" stop-color="#26363d"/></linearGradient>
+  <linearGradient id="darkShell" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34464e"/><stop offset="1" stop-color="#0b1115"/></linearGradient>
+  <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#58f4ff"/><stop offset=".5" stop-color="#d8ffff"/><stop offset="1" stop-color="#23a9ff"/></linearGradient>
+  <radialGradient id="arc"><stop offset="0" stop-color="#efffff"/><stop offset=".18" stop-color="#7ef9ff"/><stop offset=".5" stop-color="#16cfff" stop-opacity=".85"/><stop offset="1" stop-color="#008cff" stop-opacity="0"/></radialGradient>
+  <filter id="glow"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="soft"><feGaussianBlur stdDeviation="16"/></filter>
+  <clipPath id="torsoClip"><path d="M245 320 Q350 285 455 320 L500 500 Q472 560 425 585 L275 585 Q228 560 200 500Z"/></clipPath>
+</defs>
+<g fill="none" stroke-linejoin="round" stroke-linecap="round">
+  <ellipse cx="350" cy="600" rx="205" ry="510" fill="#00bfff" opacity=".07" filter="url(#soft)"/>
+  <g stroke="#0a141a" stroke-width="26">
+    <path fill="url(#shell)" d="M265 110 Q350 72 435 110 L448 195 Q422 236 396 250 L304 250 Q278 236 252 195Z"/>
+    <path fill="url(#darkShell)" d="M293 132 Q350 106 407 132 L400 202 L350 230 L300 202Z"/>
+    <path fill="#071016" d="M315 165 Q350 145 385 165 L378 188 Q350 204 322 188Z"/>
+    <path fill="url(#shell)" d="M295 236 L405 236 L420 318 L280 318Z"/>
+    <path fill="url(#shell)" d="M245 320 Q350 285 455 320 L500 500 Q472 560 425 585 L275 585 Q228 560 200 500Z"/>
+    <path fill="url(#darkShell)" d="M235 350 Q350 315 465 350 L480 475 Q444 525 410 540 L290 540 Q256 525 220 475Z"/>
+    <path fill="url(#shell)" d="M214 328 Q168 333 144 375 L121 435 L177 454 L224 412Z"/>
+    <path fill="url(#shell)" d="M486 328 Q532 333 556 375 L579 435 L523 454 L476 412Z"/>
+    <path fill="url(#shell)" d="M122 432 L174 449 L159 610 L108 592Z"/>
+    <path fill="url(#shell)" d="M578 432 L526 449 L541 610 L592 592Z"/>
+    <path fill="url(#darkShell)" d="M106 588 L164 600 L177 652 L116 661Z"/>
+    <path fill="url(#darkShell)" d="M594 588 L536 600 L523 652 L584 661Z"/>
+    <path fill="url(#shell)" d="M270 548 L430 548 L420 625 L350 668 L280 625Z"/>
+    <path fill="url(#shell)" d="M280 620 L343 665 L324 860 L232 846 L220 690Z"/>
+    <path fill="url(#shell)" d="M420 620 L357 665 L376 860 L468 846 L480 690Z"/>
+    <path fill="url(#darkShell)" d="M226 842 L330 858 L316 1030 L205 1015 L191 900Z"/>
+    <path fill="url(#darkShell)" d="M474 842 L370 858 L384 1030 L495 1015 L509 900Z"/>
+    <path fill="url(#shell)" d="M205 1010 L314 1028 L300 1128 L180 1113 L167 1060Z"/>
+    <path fill="url(#shell)" d="M495 1010 L386 1028 L400 1128 L520 1113 L533 1060Z"/>
+  </g>
+  <g stroke="url(#edge)" stroke-width="7" opacity=".9">
+    <path d="M278 119 Q350 87 422 119"/><path d="M276 140 Q350 112 424 140"/>
+    <path d="M304 245 L350 274 L396 245"/><path d="M260 329 Q350 300 440 329"/>
+    <path d="M214 348 L168 388 L152 438"/><path d="M486 348 L532 388 L548 438"/>
+    <path d="M232 555 Q350 588 468 555"/><path d="M278 630 L350 674 L422 630"/>
+    <path d="M247 702 L302 720 L289 838"/><path d="M453 702 L398 720 L411 838"/>
+    <path d="M220 875 L318 889"/><path d="M480 875 L382 889"/><path d="M211 1024 L306 1039"/><path d="M489 1024 L394 1039"/>
+  </g>
+  <g stroke="#3c5964" stroke-width="9">
+    <path d="M230 372 L270 392"/><path d="M470 372 L430 392"/>
+    <path d="M220 460 L268 447"/><path d="M480 460 L432 447"/>
+    <path d="M268 575 L300 612"/><path d="M432 575 L400 612"/>
+    <path d="M268 732 L241 820"/><path d="M432 732 L459 820"/>
+    <path d="M286 905 L270 1010"/><path d="M414 905 L430 1010"/>
+  </g>
+  <g filter="url(#glow)">
+    <circle cx="350" cy="405" r="76" fill="url(#arc)" opacity=".75"/>
+    <circle cx="350" cy="405" r="40" stroke="#d7ffff" stroke-width="9" fill="#06202a"/>
+    <path d="M350 368 C385 385 382 420 351 442 C318 420 315 385 350 368Z" stroke="#8dffff" stroke-width="9"/>
+  </g>
+  <g stroke="#8af8ff" stroke-width="5" opacity=".65">
+    <path d="M303 357 L280 334"/><path d="M397 357 L420 334"/><path d="M292 438 L256 460"/><path d="M408 438 L444 460"/>
+  </g>
+  <g fill="#91fbff" stroke="none" opacity=".9">
+    <circle cx="301" cy="353" r="5"/><circle cx="399" cy="353" r="5"/><circle cx="256" cy="460" r="4"/><circle cx="444" cy="460" r="4"/>
+  </g>
+  <g stroke="#101a20" stroke-width="13" opacity=".85">
+    <path d="M323 250 L323 300"/><path d="M377 250 L377 300"/><path d="M350 230 L350 298"/>
+    <path d="M292 585 L292 630"/><path d="M350 585 L350 660"/><path d="M408 585 L408 630"/>
+  </g>
+  <g fill="#0a1116" stroke="#5beeff" stroke-width="3">
+    <circle cx="125" cy="435" r="9"/><circle cx="575" cy="435" r="9"/><circle cx="146" cy="602" r="9"/><circle cx="554" cy="602" r="9"/>
+    <circle cx="250" cy="850" r="9"/><circle cx="450" cy="850" r="9"/><circle cx="220" cy="1015" r="9"/><circle cx="480" cy="1015" r="9"/>
+  </g>
+</g>
+</svg>
