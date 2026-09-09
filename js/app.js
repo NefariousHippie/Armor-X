@@ -1,574 +1,282 @@
-/* ============================================================
-   ARMOR X — APPLICATION JAVASCRIPT
-   ============================================================ */
-
 "use strict";
 
-
-/* ============================================================
-   DOM REFERENCES
-   ============================================================ */
+const state = {
+  menuOpen: false,
+  bootComplete: false
+};
 
 const bootScreen = document.getElementById("boot-screen");
 const bootProgressBar = document.getElementById("boot-progress-bar");
 const bootStatusText = document.getElementById("boot-status-text");
-
 const menuToggle = document.getElementById("menu-toggle");
 const mobileMenu = document.getElementById("mobile-menu");
+const terminalOutput = document.getElementById("ai-terminal-output");
+const suitStage = document.getElementById("suit-stage");
 
-const aiTerminalOutput = document.getElementById("ai-terminal-output");
+function boot() {
+  if (!bootScreen || !bootProgressBar) {
+    initializeApplication();
+    return;
+  }
 
+  document.body.classList.add("booting");
 
-/* ============================================================
-   APPLICATION STATE
-   ============================================================ */
+  const messages = [
+    "INITIALIZING SYSTEM",
+    "LOADING POWER CORE",
+    "CALIBRATING ACTUATORS",
+    "CONNECTING SENSOR ARRAY",
+    "ESTABLISHING NEURAL LINK",
+    "VERIFYING ARMOR SYSTEM",
+    "STARTING A.I. CORE",
+    "SYSTEM READY"
+  ];
 
-const state = {
-    bootComplete: false,
-    menuOpen: false
-};
+  let progress = 0;
+  let lastMessage = -1;
 
+  const timer = window.setInterval(() => {
+    progress = Math.min(100, progress + Math.floor(Math.random() * 7) + 5);
+    bootProgressBar.style.width = `${progress}%`;
 
-/* ============================================================
-   BOOT SEQUENCE
-   ============================================================ */
+    const messageIndex = Math.min(
+      messages.length - 1,
+      Math.floor(progress / (100 / messages.length))
+    );
 
-function initializeBootSequence() {
-
-    if (!bootScreen || !bootProgressBar) {
-        initializeApplication();
-        return;
+    if (messageIndex !== lastMessage && bootStatusText) {
+      bootStatusText.textContent = messages[messageIndex];
+      lastMessage = messageIndex;
     }
 
-    document.body.classList.add("booting");
+    if (progress >= 100) {
+      window.clearInterval(timer);
 
-    const bootMessages = [
-        "INITIALIZING SYSTEM",
-        "LOADING POWER CORE",
-        "CALIBRATING ACTUATORS",
-        "CONNECTING SENSOR ARRAY",
-        "ESTABLISHING NEURAL LINK",
-        "VERIFYING ARMOR SYSTEM",
-        "STARTING A.I. CORE",
-        "SYSTEM READY"
-    ];
-
-    let progress = 0;
-    let messageIndex = 0;
-
-    const interval = window.setInterval(() => {
-
-        progress += Math.floor(Math.random() * 8) + 4;
-
-        if (progress > 100) {
-            progress = 100;
-        }
-
-        bootProgressBar.style.width = `${progress}%`;
-
-        const nextMessageIndex = Math.min(
-            Math.floor(progress / (100 / bootMessages.length)),
-            bootMessages.length - 1
-        );
-
-        if (
-            nextMessageIndex !== messageIndex ||
-            progress === 100
-        ) {
-            messageIndex = nextMessageIndex;
-
-            if (bootStatusText) {
-                bootStatusText.textContent =
-                    bootMessages[messageIndex];
-            }
-        }
-
-        if (progress >= 100) {
-
-            window.clearInterval(interval);
-
-            window.setTimeout(() => {
-
-                state.bootComplete = true;
-
-                bootScreen.classList.add("hidden");
-                document.body.classList.remove("booting");
-
-                initializeApplication();
-
-            }, 650);
-        }
-
-    }, 90);
+      window.setTimeout(() => {
+        state.bootComplete = true;
+        bootScreen.classList.add("hidden");
+        document.body.classList.remove("booting");
+        initializeApplication();
+      }, 650);
+    }
+  }, 90);
 }
-
-
-/* ============================================================
-   APPLICATION INITIALIZATION
-   ============================================================ */
 
 function initializeApplication() {
-
-    initializeNavigation();
-    initializeMobileMenu();
-    initializeScrollReveal();
-    initializeActiveNavigation();
-    initializeTerminal();
-    initializeSmoothLinks();
-
+  initializeNavigation();
+  initializeMobileMenu();
+  initializeScrollReveal();
+  initializeActiveNavigation();
+  initializeTerminal();
+  initializeHeroInteraction();
 }
-
-
-/* ============================================================
-   MOBILE NAVIGATION
-   ============================================================ */
-
-function initializeMobileMenu() {
-
-    if (!menuToggle || !mobileMenu) {
-        return;
-    }
-
-    menuToggle.addEventListener("click", () => {
-
-        toggleMobileMenu();
-
-    });
-
-
-    const mobileLinks = mobileMenu.querySelectorAll("a");
-
-    mobileLinks.forEach((link) => {
-
-        link.addEventListener("click", () => {
-
-            closeMobileMenu();
-
-        });
-
-    });
-
-
-    document.addEventListener("click", (event) => {
-
-        if (!state.menuOpen) {
-            return;
-        }
-
-        const clickedInsideMenu =
-            mobileMenu.contains(event.target);
-
-        const clickedToggle =
-            menuToggle.contains(event.target);
-
-        if (!clickedInsideMenu && !clickedToggle) {
-            closeMobileMenu();
-        }
-
-    });
-
-
-    document.addEventListener("keydown", (event) => {
-
-        if (event.key === "Escape") {
-            closeMobileMenu();
-        }
-
-    });
-
-}
-
-
-function toggleMobileMenu() {
-
-    if (state.menuOpen) {
-        closeMobileMenu();
-    } else {
-        openMobileMenu();
-    }
-
-}
-
-
-function openMobileMenu() {
-
-    if (!menuToggle || !mobileMenu) {
-        return;
-    }
-
-    state.menuOpen = true;
-
-    mobileMenu.classList.add("open");
-    menuToggle.classList.add("open");
-
-    menuToggle.setAttribute(
-        "aria-expanded",
-        "true"
-    );
-
-    menuToggle.setAttribute(
-        "aria-label",
-        "Close navigation"
-    );
-
-}
-
-
-function closeMobileMenu() {
-
-    if (!menuToggle || !mobileMenu) {
-        return;
-    }
-
-    state.menuOpen = false;
-
-    mobileMenu.classList.remove("open");
-    menuToggle.classList.remove("open");
-
-    menuToggle.setAttribute(
-        "aria-expanded",
-        "false"
-    );
-
-    menuToggle.setAttribute(
-        "aria-label",
-        "Open navigation"
-    );
-
-}
-
-
-/* ============================================================
-   NAVIGATION
-   ============================================================ */
 
 function initializeNavigation() {
-
-    const navigationLinks =
-        document.querySelectorAll(".main-nav a");
-
-    navigationLinks.forEach((link) => {
-
-        link.addEventListener("click", () => {
-
-            navigationLinks.forEach((item) => {
-                item.classList.remove("active");
-            });
-
-            link.classList.add("active");
-
-        });
-
+  document.querySelectorAll('.main-nav a, .mobile-menu a').forEach((link) => {
+    link.addEventListener("click", () => {
+      const href = link.getAttribute("href");
+      if (href && href.startsWith("#")) {
+        scrollToTarget(href);
+      }
+      closeMobileMenu();
     });
+  });
 
+  document.querySelectorAll('a[href^="#"]').forEach((link) => {
+    link.addEventListener("click", (event) => {
+      const href = link.getAttribute("href");
+      if (!href || href === "#") return;
+      const target = document.querySelector(href);
+      if (!target) return;
+      event.preventDefault();
+      scrollToTarget(href);
+      closeMobileMenu();
+    });
+  });
 }
 
+function scrollToTarget(selector) {
+  const target = document.querySelector(selector);
+  if (!target) return;
 
-/* ============================================================
-   ACTIVE SECTION NAVIGATION
-   ============================================================ */
+  const header = document.querySelector(".site-header");
+  const offset = header ? header.offsetHeight + 12 : 12;
+  const top = target.getBoundingClientRect().top + window.scrollY - offset;
+
+  window.scrollTo({
+    top: Math.max(0, top),
+    behavior: "smooth"
+  });
+}
+
+function initializeMobileMenu() {
+  if (!menuToggle || !mobileMenu) return;
+
+  menuToggle.addEventListener("click", () => {
+    state.menuOpen ? closeMobileMenu() : openMobileMenu();
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!state.menuOpen) return;
+    if (!mobileMenu.contains(event.target) && !menuToggle.contains(event.target)) {
+      closeMobileMenu();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeMobileMenu();
+  });
+}
+
+function openMobileMenu() {
+  if (!menuToggle || !mobileMenu) return;
+  state.menuOpen = true;
+  mobileMenu.classList.add("open");
+  menuToggle.classList.add("open");
+  menuToggle.setAttribute("aria-expanded", "true");
+  menuToggle.setAttribute("aria-label", "Close navigation");
+}
+
+function closeMobileMenu() {
+  if (!menuToggle || !mobileMenu) return;
+  state.menuOpen = false;
+  mobileMenu.classList.remove("open");
+  menuToggle.classList.remove("open");
+  menuToggle.setAttribute("aria-expanded", "false");
+  menuToggle.setAttribute("aria-label", "Open navigation");
+}
 
 function initializeActiveNavigation() {
+  const links = Array.from(document.querySelectorAll(".main-nav a"));
+  const sections = Array.from(document.querySelectorAll("main section[id]"));
+  if (!links.length || !sections.length || !("IntersectionObserver" in window)) return;
 
-    const sections =
-        document.querySelectorAll("main section[id]");
-
-    const navigationLinks =
-        document.querySelectorAll(".main-nav a");
-
-    if (!sections.length || !navigationLinks.length) {
-        return;
-    }
-
-
-    const observer = new IntersectionObserver(
-        (entries) => {
-
-            entries.forEach((entry) => {
-
-                if (!entry.isIntersecting) {
-                    return;
-                }
-
-                const sectionId =
-                    entry.target.getAttribute("id");
-
-                navigationLinks.forEach((link) => {
-
-                    const target =
-                        link.getAttribute("href");
-
-                    link.classList.toggle(
-                        "active",
-                        target === `#${sectionId}`
-                    );
-
-                });
-
-            });
-
-        },
-        {
-            root: null,
-            threshold: 0.2,
-            rootMargin: "-20% 0px -60% 0px"
-        }
-    );
-
-
-    sections.forEach((section) => {
-        observer.observe(section);
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      const id = entry.target.id;
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${id}`);
+      });
     });
+  }, {
+    rootMargin: "-25% 0px -60% 0px",
+    threshold: 0.05
+  });
 
+  sections.forEach((section) => observer.observe(section));
 }
-
-
-/* ============================================================
-   SCROLL REVEAL
-   ============================================================ */
 
 function initializeScrollReveal() {
+  const elements = document.querySelectorAll(
+    ".section-heading, .system-card, .feature-copy, .feature-visual, .ai-feature, .ai-terminal, .spec-row, .mission-content"
+  );
 
-    const revealTargets = document.querySelectorAll(
-        ".section-heading, " +
-        ".system-card, " +
-        ".feature-copy, " +
-        ".feature-visual, " +
-        ".ai-feature, " +
-        ".ai-terminal, " +
-        ".spec-row, " +
-        ".mission-content"
-    );
+  elements.forEach((element) => element.classList.add("reveal"));
 
-    if (!revealTargets.length) {
-        return;
-    }
+  if (
+    !("IntersectionObserver" in window) ||
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  ) {
+    elements.forEach((element) => element.classList.add("visible"));
+    return;
+  }
 
-
-    revealTargets.forEach((element) => {
-
-        element.classList.add("reveal");
-
+  const observer = new IntersectionObserver((entries, observerInstance) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add("visible");
+      observerInstance.unobserve(entry.target);
     });
+  }, {
+    threshold: 0.1,
+    rootMargin: "0px 0px -45px 0px"
+  });
 
-
-    if (
-        window.matchMedia &&
-        window.matchMedia(
-            "(prefers-reduced-motion: reduce)"
-        ).matches
-    ) {
-
-        revealTargets.forEach((element) => {
-            element.classList.add("visible");
-        });
-
-        return;
-    }
-
-
-    const revealObserver =
-        new IntersectionObserver(
-            (entries, observer) => {
-
-                entries.forEach((entry) => {
-
-                    if (!entry.isIntersecting) {
-                        return;
-                    }
-
-                    entry.target.classList.add("visible");
-
-                    observer.unobserve(entry.target);
-
-                });
-
-            },
-            {
-                threshold: 0.12,
-                rootMargin: "0px 0px -50px 0px"
-            }
-        );
-
-
-    revealTargets.forEach((element) => {
-
-        revealObserver.observe(element);
-
-    });
-
+  elements.forEach((element) => observer.observe(element));
 }
-
-
-/* ============================================================
-   AI TERMINAL
-   ============================================================ */
 
 function initializeTerminal() {
+  if (!terminalOutput) return;
 
-    if (!aiTerminalOutput) {
-        return;
+  const messages = [
+    ">> DIAGNOSTIC SCAN COMPLETE",
+    ">> ALL PRIMARY SYSTEMS NOMINAL",
+    ">> OPERATOR LINK STABLE",
+    ">> ENVIRONMENTAL SENSORS ACTIVE",
+    ">> POWER DISTRIBUTION OPTIMIZED",
+    ">> PREDICTIVE CONTROL ENABLED"
+  ];
+
+  let index = 0;
+
+  window.setInterval(() => {
+    const line = document.createElement("div");
+    line.textContent = messages[index];
+    line.className = "terminal-highlight";
+    terminalOutput.appendChild(line);
+
+    while (terminalOutput.children.length > 12) {
+      terminalOutput.removeChild(terminalOutput.firstElementChild);
     }
 
-
-    const terminalMessages = [
-        ">> DIAGNOSTIC SCAN COMPLETE",
-        ">> ALL PRIMARY SYSTEMS NOMINAL",
-        ">> OPERATOR LINK STABLE",
-        ">> ENVIRONMENTAL SENSORS ACTIVE",
-        ">> POWER DISTRIBUTION OPTIMIZED",
-        ">> PREDICTIVE CONTROL ENABLED"
-    ];
-
-
-    let messageIndex = 0;
-
-
-    window.setInterval(() => {
-
-        if (messageIndex >= terminalMessages.length) {
-            messageIndex = 0;
-        }
-
-        const message =
-            document.createElement("div");
-
-        message.textContent =
-            terminalMessages[messageIndex];
-
-        aiTerminalOutput.appendChild(message);
-
-        while (aiTerminalOutput.children.length > 12) {
-
-            aiTerminalOutput.removeChild(
-                aiTerminalOutput.firstElementChild
-            );
-
-        }
-
-        messageIndex++;
-
-    }, 4200);
-
+    index = (index + 1) % messages.length;
+  }, 4200);
 }
 
+function initializeHeroInteraction() {
+  if (!suitStage || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-/* ============================================================
-   SMOOTH INTERNAL LINKS
-   ============================================================
+  let pointerX = 0;
+  let pointerY = 0;
+  let currentX = 0;
+  let currentY = 0;
+  let frame = 0;
 
-function initializeSmoothLinks() {
+  const animate = () => {
+    currentX += (pointerX - currentX) * 0.055;
+    currentY += (pointerY - currentY) * 0.055;
 
-    const links =
-        document.querySelectorAll(
-            'a[href^="#"]'
-        );
+    suitStage.style.setProperty("--pointer-x", `${currentX.toFixed(2)}deg`);
+    suitStage.style.setProperty("--pointer-y", `${currentY.toFixed(2)}deg`);
 
-    links.forEach((link) => {
+    frame = window.requestAnimationFrame(animate);
+  };
 
-        link.addEventListener("click", (event) => {
+  suitStage.addEventListener("pointermove", (event) => {
+    const rect = suitStage.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width - 0.5;
+    const y = (event.clientY - rect.top) / rect.height - 0.5;
+    pointerX = x * 8;
+    pointerY = y * -6;
+  });
 
-            const targetId =
-                link.getAttribute("href");
+  suitStage.addEventListener("pointerleave", () => {
+    pointerX = 0;
+    pointerY = 0;
+  });
 
-            if (
-                !targetId ||
-                targetId === "#"
-            ) {
-                return;
-            }
+  frame = window.requestAnimationFrame(animate);
 
-            const target =
-                document.querySelector(targetId);
-
-            if (!target) {
-                return;
-            }
-
-            event.preventDefault();
-
-            const header =
-                document.querySelector(".site-header");
-
-            const headerHeight =
-                header
-                    ? header.offsetHeight
-                    : 0;
-
-            const targetPosition =
-                target.getBoundingClientRect().top +
-                window.scrollY -
-                headerHeight;
-
-            window.scrollTo({
-                top: targetPosition,
-                behavior: "smooth"
-            });
-
-            if (state.menuOpen) {
-                closeMobileMenu();
-            }
-
-        });
-
-    });
-
+  window.addEventListener("beforeunload", () => {
+    window.cancelAnimationFrame(frame);
+  });
 }
-
-
-/* ============================================================
-   KEYBOARD ACCESSIBILITY
-   ============================================================ */
-
-document.addEventListener("keydown", (event) => {
-
-    if (event.key !== "Tab") {
-        return;
-    }
-
-    document.body.classList.add("keyboard-navigation");
-
-});
-
-
-document.addEventListener("mousedown", () => {
-
-    document.body.classList.remove(
-        "keyboard-navigation"
-    );
-
-});
-
-
-/* ============================================================
-   RESPONSIVE MENU SAFETY
-   ============================================================ */
 
 window.addEventListener("resize", () => {
-
-    if (
-        window.innerWidth > 850 &&
-        state.menuOpen
-    ) {
-        closeMobileMenu();
-    }
-
+  if (window.innerWidth > 850) closeMobileMenu();
 });
 
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Tab") document.body.classList.add("keyboard-navigation");
+});
 
-/* ============================================================
-   INITIAL START
-   ============================================================ */
+document.addEventListener("mousedown", () => {
+  document.body.classList.remove("keyboard-navigation");
+});
 
 if (document.readyState === "loading") {
-
-    document.addEventListener(
-        "DOMContentLoaded",
-        initializeBootSequence
-    );
-
+  document.addEventListener("DOMContentLoaded", boot);
 } else {
-
-    initializeBootSequence();
-
+  boot();
 }
