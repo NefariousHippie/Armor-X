@@ -1,121 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARMOR X | Powered Exoskeleton System</title>
-    <meta name="description" content="ARMOR X — Advanced powered exoskeleton interface and systems control.">
-    <meta name="theme-color" content="#05080d">
-    <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="ARMOR X AX-01 — advanced powered exoskeleton system.">
+<meta name="theme-color" content="#02070b">
+<title>ARMOR X | AX-01 Powered Exoskeleton</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div id="boot-screen" class="boot-screen">
-        <div class="boot-content">
-            <div class="boot-mark"><span class="boot-line"></span><span class="boot-x">X</span><span class="boot-line"></span></div>
-            <div class="boot-title">ARMOR X</div>
-            <div class="boot-subtitle">POWERED EXOSKELETON SYSTEM</div>
-            <div class="boot-status"><span id="boot-status-text">INITIALIZING SYSTEM</span><span class="boot-dots">...</span></div>
-            <div class="boot-progress"><div id="boot-progress-bar"></div></div>
-            <div class="boot-version">SYSTEM VERSION // AX-01</div>
+
+<div id="boot-screen" class="boot-screen">
+  <div class="boot-content">
+    <div class="boot-mark"><span></span><b>X</b><span></span></div>
+    <div class="boot-title">ARMOR X</div>
+    <div class="boot-subtitle">POWERED EXOSKELETON SYSTEM</div>
+    <div class="boot-status"><span id="boot-status-text">INITIALIZING SYSTEM</span><span>...</span></div>
+    <div class="boot-progress"><div id="boot-progress-bar"></div></div>
+    <div class="boot-version">SYSTEM VERSION // AX-01</div>
+  </div>
+</div>
+
+<div class="site-background" aria-hidden="true">
+  <div class="grid-floor"></div>
+  <div class="ambient-glow glow-one"></div>
+  <div class="ambient-glow glow-two"></div>
+  <div class="scanline"></div>
+</div>
+
+<div id="app" class="app">
+<header class="site-header">
+  <div class="header-inner">
+    <a href="#top" class="brand" aria-label="ARMOR X home">
+      <div class="brand-symbol"><span>A</span><b>X</b></div>
+      <div class="brand-copy"><strong>ARMOR X</strong><span>EXOSYSTEMS</span></div>
+    </a>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="#power-core">POWER</a>
+      <a href="#armor-system">ARMOR</a>
+      <a href="#mobility">MOBILITY</a>
+      <a href="#ai-interface">A.I.</a>
+      <a href="#specifications">SPECIFICATIONS</a>
+    </nav>
+    <div class="header-status"><i></i><span>SYSTEM ONLINE</span></div>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="mobile-menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<div id="mobile-menu" class="mobile-menu">
+  <nav aria-label="Mobile navigation">
+    <a href="#power-core">POWER</a><a href="#armor-system">ARMOR</a><a href="#mobility">MOBILITY</a><a href="#ai-interface">A.I.</a><a href="#specifications">SPECIFICATIONS</a><a href="#mission-ready">MISSION READY</a>
+  </nav>
+</div>
+
+<main id="top">
+
+<section class="hero section" id="hero">
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <div class="eyebrow"><span class="eyebrow-line"></span>NEXT-GENERATION EXOSYSTEM</div>
+      <h1>HUMAN <span>EVOLVED.</span></h1>
+      <p class="hero-description">ARMOR X is a next-generation powered exoskeleton engineered to amplify human strength, mobility, protection, and situational awareness.</p>
+      <div class="hero-actions">
+        <a href="#mission-ready" class="button button-primary">ENTER SYSTEM <b>→</b></a>
+        <a href="#specifications" class="button">VIEW SPECIFICATIONS</a>
+      </div>
+      <div class="hero-metrics">
+        <div><strong>4.8<span>x</span></strong><small>STRENGTH AMPLIFICATION</small></div>
+        <div><strong>72<span>km/h</span></strong><small>MAXIMUM MOBILITY</small></div>
+        <div><strong>99.7<span>%</span></strong><small>SYSTEM RESPONSE</small></div>
+      </div>
+    </div>
+
+    <div class="hero-display">
+      <div class="display-frame">
+        <div class="display-corner tl"></div><div class="display-corner tr"></div><div class="display-corner bl"></div><div class="display-corner br"></div>
+        <div class="display-header"><span>AX-01</span><span>SYSTEM VISUALIZATION</span></div>
+        <div class="suit-stage" id="suit-stage">
+          <div class="suit-orbit orbit-a"></div><div class="suit-orbit orbit-b"></div><div class="suit-orbit orbit-c"></div>
+          <div class="suit-scan"></div>
+          <div class="suit-image-wrap">
+            <img src="assets/armor-x-suit.svg" alt="ARMOR X AX-01 powered exoskeleton technical visualization">
+          </div>
+          <div class="suit-glow"></div>
+          <div class="target target-head"><i></i><span>HEAD SYSTEM</span></div>
+          <div class="target target-core"><i></i><span>POWER CORE</span></div>
+          <div class="target target-leg"><i></i><span>ACTUATOR</span></div>
+          <div class="center-reticle"><span></span></div>
         </div>
+        <div class="display-label label-top"><b>AX-01</b><span>LIVE TECHNICAL SCAN</span></div>
+        <div class="display-label label-left"><span>STRUCTURAL INTEGRITY</span><b>99.2%</b></div>
+        <div class="display-label label-right"><span>OPERATOR LINK</span><b>97.8%</b></div>
+        <div class="display-footer"><span>FRONT / REAR // ROTATION</span><span>STATUS // ACTIVE</span></div>
+      </div>
     </div>
+  </div>
+  <div class="hero-scroll"><span></span>SCROLL TO EXPLORE</div>
+</section>
 
-    <div class="site-background" aria-hidden="true">
-        <div class="grid-floor"></div>
-        <div class="ambient-glow glow-one"></div>
-        <div class="ambient-glow glow-two"></div>
-        <div class="scanline"></div>
+<section class="overview section" id="overview">
+  <div class="container">
+    <div class="section-heading"><div class="eyebrow"><span class="eyebrow-line"></span>SYSTEM OVERVIEW</div><h2>BUILT FOR THE <span>EXTRAORDINARY.</span></h2><p>Every ARMOR X subsystem works as a single integrated platform designed around the human operator.</p></div>
+    <div class="overview-grid">
+      <article class="system-card"><div class="card-number">01</div><div class="card-icon">◈</div><h3>POWER</h3><p>High-density energy architecture delivers sustained output without compromising mobility.</p><a href="#power-core">EXPLORE SYSTEM →</a></article>
+      <article class="system-card"><div class="card-number">02</div><div class="card-icon">◇</div><h3>PROTECTION</h3><p>Adaptive armor architecture provides a lightweight protective shell around the operator.</p><a href="#armor-system">EXPLORE SYSTEM →</a></article>
+      <article class="system-card"><div class="card-number">03</div><div class="card-icon">⬡</div><h3>MOBILITY</h3><p>Responsive actuators translate human movement into amplified mechanical performance.</p><a href="#mobility">EXPLORE SYSTEM →</a></article>
+      <article class="system-card"><div class="card-number">04</div><div class="card-icon">◎</div><h3>INTELLIGENCE</h3><p>An onboard intelligence layer monitors the system and assists the operator in real time.</p><a href="#ai-interface">EXPLORE SYSTEM →</a></article>
     </div>
+  </div>
+</section>
 
-    <div id="app" class="app">
-        <header class="site-header">
-            <div class="header-inner">
-                <a href="#top" class="brand" aria-label="ARMOR X home">
-                    <div class="brand-symbol"><span>A</span><span class="brand-x">X</span></div>
-                    <div class="brand-copy"><strong>ARMOR X</strong><span>EXOSYSTEMS</span></div>
-                </a>
-                <nav class="main-nav" aria-label="Main navigation">
-                    <a href="#power-core">POWER</a><a href="#armor-system">ARMOR</a><a href="#mobility">MOBILITY</a><a href="#ai-interface">A.I.</a><a href="#specifications">SPECIFICATIONS</a>
-                </nav>
-                <div class="header-status"><span class="status-indicator"></span><span class="status-label">SYSTEM ONLINE</span></div>
-                <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="mobile-menu"><span></span><span></span><span></span></button>
-            </div>
-        </header>
-
-        <div id="mobile-menu" class="mobile-menu">
-            <nav aria-label="Mobile navigation"><a href="#power-core">POWER</a><a href="#armor-system">ARMOR</a><a href="#mobility">MOBILITY</a><a href="#ai-interface">A.I.</a><a href="#specifications">SPECIFICATIONS</a><a href="#mission-ready">MISSION READY</a></nav>
-        </div>
-
-        <main id="top">
-            <section class="hero section">
-                <div class="hero-inner">
-                    <div class="hero-copy">
-                        <div class="eyebrow"><span class="eyebrow-line"></span>NEXT-GENERATION EXOSYSTEM</div>
-                        <h1>HUMAN <span>EVOLVED.</span></h1>
-                        <p class="hero-description">ARMOR X is a next-generation powered exoskeleton engineered to amplify human strength, mobility, protection, and situational awareness.</p>
-                        <div class="hero-actions"><a href="#mission-ready" class="button button-primary"><span>ENTER SYSTEM</span><span class="button-arrow">→</span></a><a href="#specifications" class="button button-secondary">VIEW SPECIFICATIONS</a></div>
-                        <div class="hero-metrics">
-                            <div class="hero-metric"><span class="metric-value">4.8<span>x</span></span><span class="metric-label">STRENGTH AMPLIFICATION</span></div>
-                            <div class="hero-metric"><span class="metric-value">72<span>km/h</span></span><span class="metric-label">MAXIMUM MOBILITY</span></div>
-                            <div class="hero-metric"><span class="metric-value">99.7<span>%</span></span><span class="metric-label">SYSTEM RESPONSE</span></div>
-                        </div>
-                    </div>
-                    <div class="hero-display">
-                        <div class="display-frame">
-                            <div class="display-corner corner-tl"></div><div class="display-corner corner-tr"></div><div class="display-corner corner-bl"></div><div class="display-corner corner-br"></div>
-                            <div class="display-header"><span>AX-01</span><span>SYSTEM VISUALIZATION</span></div>
-                            <div class="armor-visual">
-                                <div class="armor-ring ring-outer"></div><div class="armor-ring ring-middle"></div><div class="armor-ring ring-inner"></div>
-                                <div class="armor-crosshair horizontal"></div><div class="armor-crosshair vertical"></div>
-                                <div class="armor-core"><div class="core-inner"></div><span class="core-label">CORE</span></div>
-                                <div class="armor-silhouette">
-                                    <div class="armor-head"></div><div class="armor-neck"></div>
-                                    <div class="armor-torso"><div class="armor-chest"></div><div class="armor-ab"><span></span><span></span><span></span></div></div>
-                                    <div class="armor-shoulder shoulder-left"></div><div class="armor-shoulder shoulder-right"></div>
-                                    <div class="armor-arm arm-left"></div><div class="armor-arm arm-right"></div>
-                                    <div class="armor-hand hand-left"></div><div class="armor-hand hand-right"></div>
-                                    <div class="armor-hip"></div><div class="armor-leg leg-left"></div><div class="armor-leg leg-right"></div><div class="armor-foot foot-left"></div><div class="armor-foot foot-right"></div>
-                                </div>
-                                <div class="target-marker marker-one"><span></span><label>NEURAL LINK</label></div>
-                                <div class="target-marker marker-two"><span></span><label>POWER CORE</label></div>
-                                <div class="target-marker marker-three"><span></span><label>ACTUATOR</label></div>
-                            </div>
-                            <div class="display-footer"><span>PLATFORM // AX-01</span><span>STATUS // ACTIVE</span></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="hero-scroll"><span class="scroll-line"></span><span>SCROLL TO EXPLORE</span></div>
-            </section>
-
-            <section class="overview section">
-                <div class="container">
-                    <div class="section-heading"><div class="eyebrow"><span class="eyebrow-line"></span>SYSTEM OVERVIEW</div><h2>BUILT FOR THE <span>EXTRAORDINARY.</span></h2><p>Every ARMOR X subsystem works as a single integrated platform designed around the human operator.</p></div>
-                    <div class="overview-grid">
-                        <article class="system-card"><div class="card-number">01</div><div class="card-icon">◈</div><h3>POWER</h3><p>High-density energy architecture delivers sustained output without compromising mobility.</p><a href="#power-core">EXPLORE SYSTEM →</a></article>
-                        <article class="system-card"><div class="card-number">02</div><div class="card-icon">◇</div><h3>PROTECTION</h3><p>Adaptive armor architecture provides a lightweight protective shell around the operator.</p><a href="#armor-system">EXPLORE SYSTEM →</a></article>
-                        <article class="system-card"><div class="card-number">03</div><div class="card-icon">⬡</div><h3>MOBILITY</h3><p>Responsive actuators translate human movement into amplified mechanical performance.</p><a href="#mobility">EXPLORE SYSTEM →</a></article>
-                        <article class="system-card"><div class="card-number">04</div><div class="card-icon">◎</div><h3>INTELLIGENCE</h3><p>An onboard intelligence layer monitors the system and assists the operator in real time.</p><a href="#ai-interface">EXPLORE SYSTEM →</a></article>
-                    </div>
-                </div>
-            </section>
-
-            <section id="power-core" class="feature-section section"><div class="container"><div class="feature-grid"><div class="feature-visual"><div class="power-core-display"><div class="power-orbit orbit-one"></div><div class="power-orbit orbit-two"></div><div class="power-orbit orbit-three"></div><div class="power-core-unit"><div class="power-core-glow"></div><span>ARC</span></div></div></div><div class="feature-copy"><div class="eyebrow"><span class="eyebrow-line"></span>01 // POWER CORE</div><h2>ENERGY WITHOUT <span>COMPROMISE.</span></h2><p>The ARMOR X power architecture provides the energy density required to drive every subsystem simultaneously.</p><div class="data-list"><div class="data-row"><span>OUTPUT</span><strong>480 kW</strong></div><div class="data-row"><span>CORE EFFICIENCY</span><strong>96.4%</strong></div><div class="data-row"><span>OPERATING RANGE</span><strong>18 HRS</strong></div><div class="data-row"><span>THERMAL MANAGEMENT</span><strong>ACTIVE</strong></div></div></div></div></div></section>
-
-            <section id="armor-system" class="feature-section section section-alt"><div class="container"><div class="feature-grid feature-reverse"><div class="feature-copy"><div class="eyebrow"><span class="eyebrow-line"></span>02 // ARMOR SYSTEM</div><h2>PROTECTION <span>REDEFINED.</span></h2><p>A layered composite structure combines strength, flexibility, impact management, and operator comfort in a unified shell.</p><div class="armor-stats"><div class="stat-box"><strong>360°</strong><span>COVERAGE</span></div><div class="stat-box"><strong>40%</strong><span>WEIGHT REDUCTION</span></div><div class="stat-box"><strong>12</strong><span>PROTECTION ZONES</span></div></div></div><div class="feature-visual"><div class="armor-system-diagram"><div class="diagram-body"><div class="diagram-head"></div><div class="diagram-torso"></div><div class="diagram-arm left"></div><div class="diagram-arm right"></div><div class="diagram-leg left"></div><div class="diagram-leg right"></div></div><div class="diagram-label label-head"><span></span>HEAD SYSTEM</div><div class="diagram-label label-chest"><span></span>CHEST PLATE</div><div class="diagram-label label-arm"><span></span>ACTUATOR</div><div class="diagram-label label-leg"><span></span>LEG FRAME</div></div></div></div></div></section>
-
-            <section id="mobility" class="feature-section section"><div class="container"><div class="feature-grid"><div class="feature-visual"><div class="mobility-display"><div class="mobility-grid"></div><div class="mobility-runner"><div class="runner-head"></div><div class="runner-body"></div><div class="runner-arm arm-a"></div><div class="runner-arm arm-b"></div><div class="runner-leg leg-a"></div><div class="runner-leg leg-b"></div></div><div class="speed-lines"><span></span><span></span><span></span><span></span><span></span></div><div class="speed-readout"><span class="speed-value">72</span><span class="speed-unit">KM/H</span><span class="speed-label">MAX VELOCITY</span></div></div></div><div class="feature-copy"><div class="eyebrow"><span class="eyebrow-line"></span>03 // MOBILITY</div><h2>MOVE BEYOND <span>LIMITS.</span></h2><p>Intelligent actuators anticipate the operator's movement and provide force exactly when and where it is needed.</p><div class="mobility-bars"><div class="performance-bar"><div class="bar-header"><span>ACCELERATION</span><strong>94%</strong></div><div class="bar-track"><span style="width:94%"></span></div></div><div class="performance-bar"><div class="bar-header"><span>RESPONSE</span><strong>99%</strong></div><div class="bar-track"><span style="width:99%"></span></div></div><div class="performance-bar"><div class="bar-header"><span>STABILITY</span><strong>97%</strong></div><div class="bar-track"><span style="width:97%"></span></div></div></div></div></div></div></section>
-
-            <section id="ai-interface" class="ai-section section section-alt"><div class="container"><div class="ai-layout"><div class="ai-copy"><div class="eyebrow"><span class="eyebrow-line"></span>04 // AI INTERFACE</div><h2>THE SYSTEM <span>THINKS WITH YOU.</span></h2><p>ARMOR X continuously interprets system telemetry, environmental conditions, movement, and operator input to keep the platform performing at its peak.</p><div class="ai-features"><div class="ai-feature"><span class="feature-index">01</span><div><strong>PREDICTIVE CONTROL</strong><p>Anticipates movement before mechanical actuation begins.</p></div></div><div class="ai-feature"><span class="feature-index">02</span><div><strong>SYSTEM MONITORING</strong><p>Continuously evaluates every major subsystem.</p></div></div><div class="ai-feature"><span class="feature-index">03</span><div><strong>OPERATOR ASSIST</strong><p>Delivers information when it matters without overwhelming the operator.</p></div></div></div></div><div class="ai-terminal"><div class="terminal-header"><span>ARMOR X // A.I. CORE</span><span class="terminal-status">● CONNECTED</span></div><div id="ai-terminal-output" class="terminal-output"><div>&gt; SYSTEM INITIALIZED</div><div>&gt; NEURAL LINK ESTABLISHED</div><div>&gt; SENSOR ARRAY ONLINE</div><div>&gt; ACTUATOR NETWORK ONLINE</div><div>&gt; POWER CORE STABLE</div><div class="terminal-highlight">&gt; ARMOR X READY</div></div><div class="terminal-input"><span>&gt;</span><span class="terminal-cursor"></span></div></div></div></div></section>
-
-            <section id="specifications" class="specifications section"><div class="container"><div class="section-heading"><div class="eyebrow"><span class="eyebrow-line"></span>TECHNICAL DATA</div><h2>ENGINEERED <span>TO PERFORM.</span></h2><p>ARMOR X combines high-performance mechanical systems with an integrated digital control architecture.</p></div><div class="spec-table"><div class="spec-row spec-header"><span>SYSTEM</span><span>SPECIFICATION</span><span>STATUS</span></div><div class="spec-row"><span>POWER CORE</span><span>480 kW / High-Density Energy System</span><span class="active">ACTIVE</span></div><div class="spec-row"><span>EXOSKELETON FRAME</span><span>Adaptive Titanium Composite</span><span class="active">ACTIVE</span></div><div class="spec-row"><span>ACTUATION</span><span>Electro-Hydraulic Distributed Drive</span><span class="active">ACTIVE</span></div><div class="spec-row"><span>CONTROL SYSTEM</span><span>Neural-Assist Digital Architecture</span><span class="active">ACTIVE</span></div><div class="spec-row"><span>SENSOR NETWORK</span><span>360° Multi-Sensor Array</span><span class="active">ACTIVE</span></div><div class="spec-row"><span>COMMUNICATION</span><span>Secure Low-Latency Mesh</span><span class="active">ACTIVE</span></div><div class="spec-row"><span>OPERATIONAL RANGE</span><span>Up to 18 Hours</span><span class="active">VERIFIED</span></div></div></div></section>
-
-            <section id="mission-ready" class="mission-section section"><div class="mission-overlay"></div><div class="container"><div class="mission-content"><div class="eyebrow"><span class="eyebrow-line"></span>SYSTEM STATUS</div><h2>MISSION <span>READY.</span></h2><p>The next generation of human performance begins with the system built around it.</p><div class="mission-status-grid"><div class="mission-status"><span class="status-light"></span><div><strong>POWER CORE</strong><span>NOMINAL</span></div></div><div class="mission-status"><span class="status-light"></span><div><strong>ARMOR SYSTEM</strong><span>NOMINAL</span></div></div><div class="mission-status"><span class="status-light"></span><div><strong>MOBILITY</strong><span>NOMINAL</span></div></div><div class="mission-status"><span class="status-light"></span><div><strong>A.I. CORE</strong><span>ONLINE</span></div></div></div><a href="#top" class="button button-primary mission-button"><span>INITIALIZE ARMOR X</span><span class="button-arrow">↑</span></a></div></div></section>
-        </main>
-
-        <footer class="site-footer"><div class="container"><div class="footer-main"><div class="footer-brand"><div class="brand-symbol"><span>A</span><span class="brand-x">X</span></div><div class="brand-copy"><strong>ARMOR X</strong><span>EXOSYSTEMS</span></div></div><div class="footer-system"><span>SYSTEM STATUS</span><strong>ONLINE</strong></div><div class="footer-version"><span>AX-01</span><span>// POWERED EXOSKELETON</span></div></div><div class="footer-bottom"><span>ARMOR X // ADVANCED HUMAN PERFORMANCE SYSTEMS</span><span>© 2026 ARMOR X</span></div></div></footer>
+<section id="power-core" class="feature-section section">
+  <div class="container"><div class="feature-grid">
+    <div class="feature-visual power-visual">
+      <div class="zoom-display"><img src="assets/armor-x-suit.svg" alt="AX-01 chest reactor detail"><div class="zoom-vignette"></div><div class="zoom-box"></div><div class="callout callout-core"><i></i>ARC POWER CORE</div><div class="zoom-readout">CORE OUTPUT <b>480 kW</b></div></div>
     </div>
+    <div class="feature-copy"><div class="eyebrow"><span class="eyebrow-line"></span>01 // POWER CORE</div><h2>ENERGY WITHOUT <span>COMPROMISE.</span></h2><p>The ARMOR X power architecture provides the energy density required to drive every subsystem simultaneously.</p><div class="data-list"><div><span>OUTPUT</span><b>480 kW</b></div><div><span>CORE EFFICIENCY</span><b>96.4%</b></div><div><span>OPERATING RANGE</span><b>18 HRS</b></div><div><span>THERMAL MANAGEMENT</span><b>ACTIVE</b></div></div></div>
+  </div></div>
+</section>
 
-    <script src="js/app.js"></script>
-    <script src="js/effects.js"></script>
+<section id="armor-system" class="feature-section section section-alt">
+  <div class="container"><div class="feature-grid reverse">
+    <div class="feature-copy"><div class="eyebrow"><span class="eyebrow-line"></span>02 // ARMOR SYSTEM</div><h2>PROTECTION <span>REDEFINED.</span></h2><p>A layered composite structure combines strength, flexibility, impact management, and operator comfort in a unified shell.</p><div class="armor-stats"><div><b>360°</b><span>COVERAGE</span></div><div><b>40%</b><span>WEIGHT REDUCTION</span></div><div><b>12</b><span>PROTECTION ZONES</span></div></div></div>
+    <div class="feature-visual"><div class="armor-zoom"><img src="assets/armor-x-suit.svg" alt="AX-01 armor architecture detail"><div class="armor-overlay"></div><div class="armor-callout c1"><i></i>HEAD SYSTEM</div><div class="armor-callout c2"><i></i>CHEST PLATE</div><div class="armor-callout c3"><i></i>ACTUATOR FRAME</div><div class="zoom-readout">LAYER ANALYSIS // ACTIVE</div></div></div>
+  </div></div>
+</section>
+
+<section id="mobility" class="feature-section section">
+  <div class="container"><div class="feature-grid">
+    <div class="feature-visual"><div class="mobility-display"><div class="mobility-grid"></div><div class="motion-suit"><img src="assets/armor-x-suit.svg" alt="AX-01 mobility visualization"></div><div class="ghost-suit ghost-one"><img src="assets/armor-x-suit.svg" alt=""></div><div class="ghost-suit ghost-two"><img src="assets/armor-x-suit.svg" alt=""></div><div class="speed-lines"><i></i><i></i><i></i><i></i><i></i></div><div class="speed-readout"><strong>72</strong><span>KM/H</span><small>MAX VELOCITY</small></div><div class="motion-tag">MOTION ANALYSIS // LIVE</div></div></div>
+    <div class="feature-copy"><div class="eyebrow"><span class="eyebrow-line"></span>03 // MOBILITY</div><h2>MOVE BEYOND <span>LIMITS.</span></h2><p>Intelligent actuators anticipate the operator's movement and provide force exactly when and where it is needed.</p><div class="performance-list"><div><header><span>ACCELERATION</span><b>94%</b></header><div><i style="width:94%"></i></div></div><div><header><span>RESPONSE</span><b>99%</b></header><div><i style="width:99%"></i></div></div><div><header><span>STABILITY</span><b>97%</b></header><div><i style="width:97%"></i></div></div></div></div>
+  </div></div>
+</section>
+
+<section id="ai-interface" class="ai-section section section-alt">
+  <div class="container"><div class="ai-layout">
+    <div class="ai-copy"><div class="eyebrow"><span class="eyebrow-line"></span>04 // A.I. INTERFACE</div><h2>THE SYSTEM <span>THINKS WITH YOU.</span></h2><p>ARMOR X continuously interprets system telemetry, environmental conditions, movement, and operator input to keep the platform performing at its peak.</p><div class="ai-features"><article><b>01</b><div><strong>PREDICTIVE CONTROL</strong><p>Anticipates movement before mechanical actuation begins.</p></div></article><article><b>02</b><div><strong>SYSTEM MONITORING</strong><p>Continuously evaluates every major subsystem.</p></div></article><article><b>03</b><div><strong>OPERATOR ASSIST</strong><p>Delivers information when it matters without overwhelming the operator.</p></div></article></div></div>
+    <div class="ai-terminal"><header><span>ARMOR X // A.I. CORE</span><b>● CONNECTED</b></header><div id="ai-terminal-output" class="terminal-output"><div>&gt; SYSTEM INITIALIZED</div><div>&gt; NEURAL LINK ESTABLISHED</div><div>&gt; SENSOR ARRAY ONLINE</div><div>&gt; ACTUATOR NETWORK ONLINE</div><div>&gt; POWER CORE STABLE</div><div class="terminal-highlight">&gt; ARMOR X READY</div></div><footer><span>&gt;</span><i></i></footer></div>
+  </div></div>
+</section>
+
+<section id="specifications" class="specifications section">
+  <div class="container"><div class="section-heading"><div class="eyebrow"><span class="eyebrow-line"></span>TECHNICAL DATA</div><h2>ENGINEERED <span>TO PERFORM.</span></h2><p>ARMOR X combines high-performance mechanical systems with an integrated digital control architecture.</p></div>
+  <div class="spec-table">
+    <div class="spec-row spec-header"><span>SYSTEM</span><span>SPECIFICATION</span><span>STATUS</span></div>
+    <div class="spec-row"><span>POWER CORE</span><span>480 kW / High-Density Energy System</span><b>ACTIVE</b></div>
+    <div class="spec-row"><span>EXOSKELETON FRAME</span><span>Adaptive Titanium Composite</span><b>ACTIVE</b></div>
+    <div class="spec-row"><span>ACTUATION</span><span>Electro-Hydraulic Distributed Drive</span><b>ACTIVE</b></div>
+    <div class="spec-row"><span>CONTROL SYSTEM</span><span>Neural-Assist Digital Architecture</span><b>ACTIVE</b></div>
+    <div class="spec-row"><span>SENSOR NETWORK</span><span>360° Multi-Sensor Array</span><b>ACTIVE</b></div>
+    <div class="spec-row"><span>COMMUNICATION</span><span>Secure Low-Latency Mesh</span><b>ACTIVE</b></div>
+    <div class="spec-row"><span>OPERATIONAL RANGE</span><span>Integrated Power Management</span><b>VERIFIED</b></div>
+  </div></div>
+</section>
+
+<section id="mission-ready" class="mission-section section">
+  <div class="mission-bg"><img src="assets/armor-x-suit.svg" alt="AX-01 exoskeleton mission-ready visualization"></div>
+  <div class="mission-overlay"></div>
+  <div class="container"><div class="mission-content"><div class="eyebrow"><span class="eyebrow-line"></span>SYSTEM STATUS</div><h2>MISSION <span>READY.</span></h2><p>The next generation of human performance begins with the system built around it.</p><div class="mission-status-grid"><div><i></i><strong>POWER CORE</strong><span>NOMINAL</span></div><div><i></i><strong>ARMOR SYSTEM</strong><span>NOMINAL</span></div><div><i></i><strong>MOBILITY</strong><span>ONLINE</span></div><div><i></i><strong>A.I. CORE</strong><span>ONLINE</span></div></div><a href="#hero" class="button button-primary">INITIALIZE ARMOR X</a></div></div>
+</section>
+
+</main>
+
+<footer class="site-footer"><div class="container"><div class="footer-inner"><strong>ARMOR X</strong><span>AX-01 // POWERED EXOSKELETON SYSTEM</span><span class="footer-status">● SYSTEMS NOMINAL</span></div></div></footer>
+</div>
+
+<script src="js/app.js"></script>
 </body>
 </html>
